@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+        <ScrollView
+        android:id="@+id/svOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+    
+    <RadioGroup
+        android:id="@+id/rgOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/rbPtLoad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Add Point Load" />
+
+        <RadioButton
+            android:id="@+id/rbDistLoad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Distributed Load" />
+
+    </RadioGroup>
+    </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
