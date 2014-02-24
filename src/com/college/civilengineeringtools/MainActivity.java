@@ -24,6 +24,12 @@ import android.widget.ToggleButton;
 public class MainActivity extends FragmentActivity implements OnClickListener,
 		LoadOptionsDialogFragment.NoticeDialogListener,
 		InputDialogFragment.NoticeDialogListener {
+	
+	public static enum LoadType{
+		POINT_LOAD, DISTRIBUTED_LOAD
+	}
+	
+	private static LoadType loadMode;
 
 	public static int beamType;
 
@@ -43,9 +49,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
 	public final static int SHEAR = 0;
 	public final static int MOMENT = 1;
-
-	public final static int POINT_LOAD = 0;
-	public final static int DIST_LOAD = 1;
 
 	public static Canvas distLoadCanvas, beamCanvas;
 
@@ -89,22 +92,15 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		super.onStart();
 
 		addLoad = (Button) findViewById(R.id.bAddLoad);
-		showShear = (Button) findViewById(R.id.bShowShear);
-		showMom = (Button) findViewById(R.id.bShowMoment);
-
-		deleteTB = (ToggleButton) findViewById(R.id.tbDelete);
-
-		lgth = (EditText) findViewById(R.id.etLength);
-
-		rlpl = (RelativeLayout) findViewById(R.id.rlSimpleBeamPLImages);
-		rldl = (RelativeLayout) findViewById(R.id.rlSimpleBeamDLImages);
-		main = (RelativeLayout) findViewById(R.id.rlSimpleBeam);
-		dlTop = (RelativeLayout) findViewById(R.id.rlDistLoadTop);
-
 		addLoad.setOnClickListener(this);
+		
+		showShear = (Button) findViewById(R.id.bShowShear);
 		showShear.setOnClickListener(this);
+		
+		showMom = (Button) findViewById(R.id.bShowMoment);
 		showMom.setOnClickListener(this);
 
+		deleteTB = (ToggleButton) findViewById(R.id.tbDelete);
 		deleteTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
 			@Override
@@ -114,6 +110,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			}
 
 		});
+
+		lgth = (EditText) findViewById(R.id.etLength);
+
+		rlpl = (RelativeLayout) findViewById(R.id.rlSimpleBeamPLImages);
+		rldl = (RelativeLayout) findViewById(R.id.rlSimpleBeamDLImages);
+		main = (RelativeLayout) findViewById(R.id.rlSimpleBeam);
+		dlTop = (RelativeLayout) findViewById(R.id.rlDistLoadTop);
 
 		beam = new DrawBeam(this);
 		beamCanvas = new Canvas();
@@ -214,65 +217,52 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		// TODO Auto-generated method stub
 		switch (resource) {
 		case R.id.rbPtLoad:
-			addPtLoad = new InputDialogFragment(this, POINT_LOAD);
+			loadMode = LoadType.POINT_LOAD;
+			addPtLoad = new InputDialogFragment(this);
 			addPtLoad.show(getSupportFragmentManager(), "PtLoadDialog");
 			break;
 		case R.id.rbDistLoad:
-			DialogFragment addDistLoad = new InputDialogFragment(this, DIST_LOAD);
+			loadMode = LoadType.DISTRIBUTED_LOAD;
+			DialogFragment addDistLoad = new InputDialogFragment(this);
 			addDistLoad.show(getSupportFragmentManager(), "DistLoadDialog");
 			break;
 		}
 	}
 
 	@Override
-	public void onDialogPositiveClick(DialogFragment dialog, int tag,
+	public void onDialogPositiveClick(DialogFragment dialog,
 			String sMag, String eMag, String sPos, String ePos) {
 		// TODO Auto-generated method stub
 
-		switch (tag) {
+		switch (loadMode) {
 		case POINT_LOAD:
 			PointLoad pl = new PointLoad(sMag, sPos, this);
 
-			CustomParams ptParams = new CustomParams(this, POINT_LOAD);
+			CustomParams ptParams = new CustomParams(this, loadMode);
 
 			ptParams.setLeftMargin(Double.parseDouble(sPos));
-
-			//rlpl.addView(pl.getImage(), PointLoadManager.getInstance().getSize(), ptParams);
 			
 			ImageView image = pl.getImage();
 
 			PointLoadManager.getInstance().addPtLoad(pl, image, ptParams);
 
-			//pl.setIndex(PointLoadManager.getInstance().getPtLoads().size() - 1);
-
 			break;
-		case DIST_LOAD:
+		case DISTRIBUTED_LOAD:
 			DistributedLoad dl = new DistributedLoad(sMag, eMag, sPos, ePos,
 					this);
 			
 			CustomParams[] dlParams = new CustomParams[2];
-			dlParams[0] = new CustomParams(this, DIST_LOAD);
-			dlParams[1] = new CustomParams(this, DIST_LOAD);
-			
-			//CustomParams dlParamsStart = new CustomParams(this, DIST_LOAD);
-			//CustomParams dlParamsEnd = new CustomParams(this, DIST_LOAD);
+			dlParams[0] = new CustomParams(this, loadMode);
+			dlParams[1] = new CustomParams(this, loadMode);
 
 			dlParams[0].setLeftMargin(Double.parseDouble(sPos));
 			dlParams[1].setLeftMargin(Double.parseDouble(ePos));
-
-			//rldl.addView(dl.getImages()[0], 2 * DistributedLoadManager.getInstance().getDistLoads().size(), dlParamsStart);
-			//rldl.addView(dl.getImages()[1], 2 * DistributedLoadManager.getInstance().getDistLoads().size() + 1, dlParamsEnd);
 			
 			ImageView[] images = new ImageView[2];
 			images[0] = dl.getImages()[0];
 			images[1] = dl.getImages()[1];
 			
-
 			DistributedLoadManager.getInstance().addDistLoad(dl, images, dlParams);
-
-			//dl.setIndex(DistributedLoadManager.getInstance().getDistLoads()
-			//		.size() - 1);
-
 
 			break;
 		}
@@ -287,6 +277,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	public static double getLength() {
 		length = Double.parseDouble(lgth.getText().toString());
 		return length;
+	}
+	
+	public static LoadType getLoadType() {
+		return loadMode;
 	}
 
 	public static void setBeamType(int type) {

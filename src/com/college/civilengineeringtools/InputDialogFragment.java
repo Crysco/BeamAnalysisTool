@@ -1,5 +1,7 @@
 package com.college.civilengineeringtools;
 
+import com.college.civilengineeringtools.MainActivity.LoadType;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,12 +15,13 @@ import android.widget.Toast;
 
 public class InputDialogFragment extends DialogFragment {
 
-	int type, n;
+	private LoadType type;
+	private int n;
 	private Context context;
 	EditText inputName, inputType, inputSMag, inputEMag, inputSPos, inputEPos;
 
-	public InputDialogFragment(Context context, int tag) {
-		type = tag;
+	public InputDialogFragment(Context context) {
+		type = MainActivity.getLoadType();
 		this.context = context;
 	}
 
@@ -28,7 +31,7 @@ public class InputDialogFragment extends DialogFragment {
 	 * passes the DialogFragment in case the host needs to query it.
 	 */
 	public interface NoticeDialogListener {
-		public void onDialogPositiveClick(DialogFragment dialog, int type,
+		public void onDialogPositiveClick(DialogFragment dialog,
 				String start_pos, String end_post, String start_mag,
 				String end_pos);
 
@@ -65,9 +68,9 @@ public class InputDialogFragment extends DialogFragment {
 
 		int layout[] = { R.layout.dialog_input_point_load,
 				R.layout.dialog_input_dist_load };
-		if (type == MainActivity.POINT_LOAD) {
+		if (type == LoadType.POINT_LOAD) {
 			n = 0;
-		} else if (type == MainActivity.DIST_LOAD) {
+		} else if (type == LoadType.DISTRIBUTED_LOAD) {
 			n = 1;
 		}
 
@@ -89,7 +92,7 @@ public class InputDialogFragment extends DialogFragment {
 								inputEPos = (EditText) ((Dialog) dialog)
 										.findViewById(R.id.etEndPos);
 
-								if (n == 0) {
+								if (type == LoadType.POINT_LOAD) {
 									if (inputSMag.getText().toString()
 											.equals("")
 
@@ -98,18 +101,23 @@ public class InputDialogFragment extends DialogFragment {
 										Toast.makeText(context,
 												"Missing some values.",
 												Toast.LENGTH_SHORT).show();
-									} else if(Double.parseDouble(inputSPos.getText().toString()) > MainActivity.getLength() || Double.parseDouble(inputSPos.getText().toString()) < 0) {
-										Toast.makeText(context,
+									} else if (Double.parseDouble(inputSPos
+											.getText().toString()) > MainActivity
+											.getLength()
+											|| Double.parseDouble(inputSPos
+													.getText().toString()) < 0) {
+										Toast.makeText(
+												context,
 												"Can't put a load on this air!",
 												Toast.LENGTH_LONG).show();
 									} else {
 										mListener.onDialogPositiveClick(
-												InputDialogFragment.this, type,
+												InputDialogFragment.this,
 												inputSMag.getText().toString(),
 												null, inputSPos.getText()
 														.toString(), null);
 									}
-								} else if (n == 1) {
+								} else if (type == LoadType.DISTRIBUTED_LOAD) {
 									if (inputSMag.getText().toString()
 											.equals("")
 											|| inputEMag.getText().toString()
@@ -121,18 +129,31 @@ public class InputDialogFragment extends DialogFragment {
 										Toast.makeText(context,
 												"Missing some values.",
 												Toast.LENGTH_SHORT).show();
-									} else if (Double.parseDouble(inputSPos.getText().toString()) > Double.parseDouble(inputEPos.getText().toString())) {
-										Toast.makeText(context,
+									} else if (Double.parseDouble(inputSPos
+											.getText().toString()) > Double
+											.parseDouble(inputEPos.getText()
+													.toString())) {
+										Toast.makeText(
+												context,
 												"Ending position cannot be less than the starting position.",
 												Toast.LENGTH_LONG).show();
-									} else if(Double.parseDouble(inputSPos.getText().toString()) > MainActivity.getLength() || Double.parseDouble(inputEPos.getText().toString()) > MainActivity.getLength()
-											|| Double.parseDouble(inputSPos.getText().toString()) < 0 || Double.parseDouble(inputSPos.getText().toString()) > 0) {
-										Toast.makeText(context,
+									} else if (Double.parseDouble(inputSPos
+											.getText().toString()) > MainActivity
+											.getLength()
+											|| Double.parseDouble(inputEPos
+													.getText().toString()) > MainActivity
+													.getLength()
+											|| Double.parseDouble(inputSPos
+													.getText().toString()) < 0
+											|| Double.parseDouble(inputEPos
+													.getText().toString()) < 0 ) {
+										Toast.makeText(
+												context,
 												"Can't put a load on thin air!",
 												Toast.LENGTH_LONG).show();
 									} else {
 										mListener.onDialogPositiveClick(
-												InputDialogFragment.this, type,
+												InputDialogFragment.this,
 												inputSMag.getText().toString(),
 												inputEMag.getText().toString(),
 												inputSPos.getText().toString(),

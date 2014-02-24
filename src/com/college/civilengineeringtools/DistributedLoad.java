@@ -28,11 +28,9 @@ public class DistributedLoad implements Parcelable {
 		
 		
 		startImage = new ImageView(context);
-		startImage.setId(MainActivity.DIST_LOAD);
 		startImage.setImageBitmap(GlobalProperties.resizedDist);
 		
 		endImage = new ImageView(context);
-		endImage.setId(MainActivity.DIST_LOAD);
 		endImage.setImageBitmap(GlobalProperties.resizedDist);
 		
 		Log.d("hfksfjsa", Double.toString(GlobalProperties.distLoadHeight));

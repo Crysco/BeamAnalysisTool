@@ -1,5 +1,7 @@
 package com.college.civilengineeringtools;
 
+import com.college.civilengineeringtools.MainActivity.LoadType;
+
 import android.content.Context;
 import android.widget.RelativeLayout;
 
@@ -23,13 +25,14 @@ public class CustomParams extends RelativeLayout.LayoutParams {
 
 	}
 
-	public CustomParams(Context context, int loadType) {
+	public CustomParams(Context context, LoadType type) {
 		super(RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 		
-		if(loadType == MainActivity.POINT_LOAD) 
+		
+		if(type == LoadType.POINT_LOAD) 
 			this.topMargin = (int) (GlobalProperties.beamTop- GlobalProperties.ptLoadHeight);
-		else if(loadType == MainActivity.DIST_LOAD)
+		else if(type == LoadType.DISTRIBUTED_LOAD)
 			this.topMargin = (int) (GlobalProperties.beamTop- GlobalProperties.distLoadHeight);
 
 	}

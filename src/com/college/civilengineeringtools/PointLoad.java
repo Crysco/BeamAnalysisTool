@@ -12,7 +12,8 @@ public class PointLoad implements Parcelable {
 	private int index;
 
 	public PointLoad() {
-		position = magnitude = null;
+		this.position = null;
+		this.magnitude = null;
 		image = null;
 	}
 
@@ -21,14 +22,9 @@ public class PointLoad implements Parcelable {
 		this.position = position;
 		
 		image = new ImageView(context);
-		
 		image.setImageBitmap(GlobalProperties.resizedPt);
-		
-		image.setId(MainActivity.POINT_LOAD);
-	
 		image.setOnTouchListener(new LoadOnTouchListener(this, context));
-		
-		
+	
 	}
 
 	public final double getPosition() {

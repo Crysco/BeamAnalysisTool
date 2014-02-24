@@ -13,22 +13,21 @@ public class LoadOnTouchListener implements OnTouchListener {
 	private PointLoad pointLoad;
 	private DistributedLoad dlLoad;
 	private Context context;
+	private TouchedObjectType tag;
+	
 	private TextView showPos;
-	private CustomParams textParams;
-	private int tag;
-	final public static int PL = 0;
-	final public static int DLS = 1;
-	final public static int DLE = 2;
-
-	private int index;
-
+	
+	private enum TouchedObjectType {
+		PL, DLS, DLE
+	}
+	
 	private double pos, startPos, endPos;
 
 	public LoadOnTouchListener(PointLoad pt, Context c) {
 		pointLoad = pt;
 		context = c;
 		pos = pt.getPosition();
-		tag = PL;
+		tag = TouchedObjectType.PL;
 	}
 
 	public LoadOnTouchListener(DistributedLoad dl, int loc, Context c) {
@@ -39,79 +38,79 @@ public class LoadOnTouchListener implements OnTouchListener {
 		endPos = dl.getEndingPosition();
 
 		if (loc == DistributedLoad.BEGIN)
-			tag = DLS;
+			tag = TouchedObjectType.DLS;
 		else if (loc == DistributedLoad.END)
-			tag = DLE;
-
+			tag = TouchedObjectType.DLE;
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
-
+		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			if (!MainActivity.deleteTB.isChecked()) {
 				Vibrator vb = (Vibrator) context
 						.getSystemService(Context.VIBRATOR_SERVICE);
+				
+				CustomParams textParams = new CustomParams(context);
 
-				switch (v.getId()) {
-				case MainActivity.POINT_LOAD:
-					index = pointLoad.getIndex();
+				switch (tag) {
+				case PL:
 
 					vb.vibrate(100);
 
 					showPos = new TextView(context);
-
 					showPos.setText(Double.toString(pos));
-					textParams = new CustomParams(context);
-
 					textParams.setLeftMargin(pos);
-
 					showPos.setLayoutParams(textParams);
 					MainActivity.main.addView(showPos);
 
 					break;
 
-				case MainActivity.DIST_LOAD:
-					index = dlLoad.getIndex();
+				case DLS:
 
 					vb.vibrate(100);
 
 					showPos = new TextView(context);
-					if (tag == DLS) {
-						showPos.setText(Double.toString(startPos));
-						textParams = new CustomParams(context);
-
-						textParams.setLeftMargin(startPos);
-
-						showPos.setLayoutParams(textParams);
-						MainActivity.main.addView(showPos);
-					} else if (tag == DLE) {
-						showPos.setText(Double.toString(endPos));
-						textParams = new CustomParams(context);
-
-						textParams.setLeftMargin(endPos);
-
-						showPos.setLayoutParams(textParams);
-						MainActivity.main.addView(showPos);
-					}
+					showPos.setText(Double.toString(startPos));
+					textParams.setLeftMargin(startPos);
+					showPos.setLayoutParams(textParams);
+					MainActivity.main.addView(showPos);
+						
 					break;
+					
+				case DLE:
+					
+					vb.vibrate(100);
+					
+					showPos = new TextView(context);
+					showPos.setText(Double.toString(endPos));
+					textParams.setLeftMargin(endPos);
+					showPos.setLayoutParams(textParams);
+					MainActivity.main.addView(showPos);
+					
+					break;
+					
 				}
-			} else if (MainActivity.deleteTB.isChecked()) {
+			} else {
+				
+				int index;
+				
 				switch (tag) {
 				case PL:
+					
 					index = pointLoad.getIndex();
 					PointLoadManager.getInstance().deletePtLoad(index);
 					break;
-				case DLS:
-					index = dlLoad.getIndex();
-					DistributedLoadManager.getInstance().deleteDistLoad(index);
-					break;
+					
+				case DLS:				
 				case DLE:
+					
 					index = dlLoad.getIndex();
 					DistributedLoadManager.getInstance().deleteDistLoad(index);
 					break;
+					
 				}
 			}
 
@@ -140,6 +139,7 @@ public class LoadOnTouchListener implements OnTouchListener {
 				switch (tag) {
 
 				case PL:
+					
 					if (actualPosition <= 0)
 						pointLoad.setPosition(0);
 					else if (actualPosition >= MainActivity.getLength())
@@ -149,7 +149,9 @@ public class LoadOnTouchListener implements OnTouchListener {
 
 					showPos.setText(Double.toString(pointLoad.getPosition()));
 					break;
+					
 				case DLS:
+					
 					if (actualPosition <= 0)
 						dlLoad.setStartingPosition(0);
 					else if (actualPosition >= MainActivity.getLength())
@@ -162,7 +164,9 @@ public class LoadOnTouchListener implements OnTouchListener {
 					showPos.setText(Double.toString(dlLoad
 							.getStartingPosition()));
 					break;
+					
 				case DLE:
+		
 					if (actualPosition <= 0)
 						dlLoad.setEndingPosition(0);
 					else if (actualPosition >= MainActivity.getLength())
@@ -174,6 +178,7 @@ public class LoadOnTouchListener implements OnTouchListener {
 
 					showPos.setText(Double.toString(dlLoad.getEndingPosition()));
 					break;
+					
 				default:
 					break;
 				}
